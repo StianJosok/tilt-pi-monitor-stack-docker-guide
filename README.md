@@ -25,6 +25,13 @@ If you encounter issues or have suggestions for improvements, feel free to open 
 
 ---
 
+##Plans for the Future
+
+I would like to dockerize the Node-RED aspect of the Tilt Pi
+I would like to dockerize the aioblescan to allow capturing data directly from the Tilt Hydrometer
+
+---
+
 ## License
 
 ### Creative Commons Attribution 4.0 International (CC BY 4.0)
@@ -47,4 +54,13 @@ Under the following terms:
 ---
 
 By contributing to this project, you agree that your contributions will be licensed under the same Creative Commons license.
+
+---
+
+## Acknowledgments
+
+I would like to thank Baron Brew, the creators of the Tilt Hydrometer, for creating such a cool product and for the support they’ve offered throughout this project. Their customer service and community-focused approach is great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
+
+[Learn more about their products](https://tilthydrometer.com).
+
 
