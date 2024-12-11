@@ -8,9 +8,8 @@ This guide provides step-by-step instructions for setting up a monitoring stack 
 ## Getting Started
 
 ### Prerequisites
-- Raspberry Pi running Raspberry Pi OS Lite (no desktop environment).
 - A functioning Tilt Hydrometer.
-- Docker and Docker Compose installed.
+- A Raspberry Pi
 
 ### Installation Steps
 1. Clone this repository:
@@ -25,26 +24,6 @@ This guide provides step-by-step instructions for setting up a monitoring stack 
 
 ---
 
-## How to Contribute
-
-We welcome contributions! Here's how you can get involved:
-
-1. Fork this repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add a new feature"
-   ```
-4. Push to your fork:
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. Create a pull request.
-
----
 
 ## Issues and Support
 If you encounter issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
