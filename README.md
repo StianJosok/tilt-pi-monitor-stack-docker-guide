@@ -12,15 +12,10 @@ This guide provides step-by-step instructions for setting up a monitoring stack 
 - A Raspberry Pi
 
 ### Installation Steps
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/StianJosok/tilt-pi-monitor-stack-docker-guide.git
-   ```
-2. Navigate into the cloned folder:
-   ```bash
-   cd tilt-pi-monitor-stack-docker-guide
-   ```
-3. Follow the instructions in `tilt-pi-monitor-stack-docker-guide.md` for detailed setup steps.
+
+Simply follow the instructions in the file called `tilt-pi-monitor-stack-docker-guide.md`
+
+The `docker-compse.yaml`, configuration file for telegraf and `.env` file are in this repository, although you can copy and paste from the guide.md 
 
 ---
 
@@ -34,7 +29,7 @@ If you encounter issues or have suggestions for improvements, feel free to open 
 
 ### Creative Commons Attribution 4.0 International (CC BY 4.0)
 
-Copyright (c) 2024 Stian Josok
+Copyright (c) 2024 Stian Jøsok
 
 You are free to:
 
