@@ -15,20 +15,27 @@ This guide provides step-by-step instructions for setting up a monitoring stack 
 
 Simply follow the instructions in the file called `tilt-pi-monitor-stack-docker-guide.md`
 
-The `docker-compse.yaml`, configuration file for telegraf and `.env` file are in this repository, although you can copy and paste from the guide.md 
+The `docker-compose.yaml`, configuration file for Telegraf, and `.env` file are in this repository, although you can copy and paste from the guide.md
 
 ---
-
 
 ## Issues and Support
 If you encounter issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
 
 ---
 
-##Plans for the Future
+## Plans for the Future
 
-I would like to dockerize the Node-RED aspect of the Tilt Pi
-I would like to dockerize the aioblescan to allow capturing data directly from the Tilt Hydrometer
+- Dockerize the Node-RED aspect of the Tilt Pi.
+- Dockerize the aioblescan to allow capturing data directly from the Tilt Hydrometer.
+
+---
+
+## Acknowledgments
+
+I would like to thank Baron Brew, the creators of the Tilt Hydrometer, for creating such a great product and for the support they’ve offered throughout this project. Their customer service and community-focused approach has been great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
+
+[Learn more about their products](https://tilthydrometer.com).
 
 ---
 
@@ -54,13 +61,4 @@ Under the following terms:
 ---
 
 By contributing to this project, you agree that your contributions will be licensed under the same Creative Commons license.
-
----
-
-## Acknowledgments
-
-I would like to thank Baron Brew, the creators of the Tilt Hydrometer, for creating such a cool product and for the support they’ve offered throughout this project. Their customer service and community-focused approach is great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
-
-[Learn more about their products](https://tilthydrometer.com).
-
 
