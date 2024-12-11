@@ -1,0 +1,50 @@
+# System files
+
+.DS_Store
+
+Thumbs.db
+
+
+# Temporary files and backups
+
+*.tmp
+
+*.swp
+
+*.bak
+
+*.old
+
+*~
+
+
+# Logs
+
+*.log
+
+
+# Docker-specific
+
+docker-compose.override.yml
+
+secrets.env
+
+
+# IDE/editor files
+
+.vscode/
+
+.idea/
+
+
+# Ignore files with specific prefixes/suffixes
+
+temp_*        # Files starting with 'temp_'
+
+*_backup.*    # Files ending with '_backup' and any extension
+
+
+# Custom developer notes
+
+*.notes
+edit.*
