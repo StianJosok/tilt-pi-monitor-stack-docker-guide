@@ -11,38 +11,6 @@ This guide explains how to set up a monitoring stack using Docker, InfluxDB, Tel
 - A functioning Tilt Hydrometer.
 - A Raspberry Pi
 
-### Installation Steps
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/StianJosok/tilt-pi-monitor-stack-docker-guide.git
-   ```
-2. Navigate into the cloned folder:
-   ```bash
-   cd tilt-pi-monitor-stack-docker-guide
-   ```
-3. Follow the instructions in `tilt-pi-monitor-stack-docker-guide.md` for detailed setup steps.
-
----
-
-## How to Contribute
-
-We welcome contributions! Here's how you can get involved:
-
-1. Fork this repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add a new feature"
-   ```
-4. Push to your fork:
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. Create a pull request.
-
 ---
 
 ## Issues and Support
