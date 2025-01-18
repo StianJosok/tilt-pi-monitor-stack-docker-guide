@@ -12,28 +12,41 @@ This guide explains how to set up a monitoring stack using Docker, InfluxDB, Tel
 - A Raspberry Pi
 
 ### Installation Steps
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/StianJosok/tilt-pi-monitor-stack-docker-guide.git
+   ```
+2. Navigate into the cloned folder:
+   ```bash
+   cd tilt-pi-monitor-stack-docker-guide
+   ```
+3. Follow the instructions in `tilt-pi-monitor-stack-docker-guide.md` for detailed setup steps.
 
-Follow the instructions in **[tilt-pi-monitor-stack-docker-guide.md](./tilt-pi-monitor-stack-docker-guide.md)** to set up your monitoring stack. The required files, including `docker-compose.yaml`, the Telegraf configuration file, and `.env`, are provided for convenience. You can also copy and paste directly from the guide if preferred.
+---
+
+## How to Contribute
+
+We welcome contributions! Here's how you can get involved:
+
+1. Fork this repository.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "Add a new feature"
+   ```
+4. Push to your fork:
+   ```bash
+   git push origin feature/your-feature
+   ```
+5. Create a pull request.
 
 ---
 
 ## Issues and Support
 If you encounter issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
-
----
-
-## Future Plans
-- Dockerize the Node-RED aspect of the Tilt Pi for simplified deployment.
-- Dockerize `aioblescan` to allow direct data capture from the Tilt Hydrometer as a light weight alterntive to Node-Red
-
----
-
-## Acknowledgments
-
-I would like to thank **Baron Brew Equipment**, the creators of the **Tilt Hydrometer**, for creating such a great product and for the support they’ve offered throughout this project. Their customer service and community-focused approach has been great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
-
-[Learn more about their products](https://tilthydrometer.com).
-
 
 ---
 
