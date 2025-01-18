@@ -138,7 +138,7 @@ networks:
 
 ### Creating the `.env` File
 
-To securely store sensitive credentials and allow for easier configuration, create a `.env` file in the same directory as the `docker-compose.yml` file. Add the following content:
+To securely store sensitive credentials and allow for easier configuration, create a `.env` file in the same directory as the `docker-compose.yml` file (the `database` folder). Add the following content:
 
 `nano .env`
 
@@ -186,7 +186,7 @@ You should see the InfluxDB web UI ogin page. Log in using the credentials you d
     INFLUXDB_ADMIN_USERNAME=whatever-value-you-put-here
     INFLUXDB_ADMIN_PASSWORD=and-here
 
-If you do not see a dashboard, check you ip is correct and use
+If you do not see a dashboard, check your ip is correct and use
     
     docker logs influxdb
 

@@ -1,7 +1,7 @@
 # README - Tilt Pi Monitor Stack Docker Guide
 
 ## Overview
-This guide provides step-by-step instructions for setting up a monitoring stack with Docker to extract data from a Tilt Hydrometer and display it in Grafana. It covers using InfluxDB, Telegraf, and Docker Compose to create a complete data monitoring and visualization pipeline.
+This guide explains how to set up a monitoring stack using Docker, InfluxDB, Telegraf, and Grafana to track data from a Tilt Hydrometer. It provides step-by-step instructions for creating a complete data monitoring and visualization pipeline.
 
 ---
 
@@ -13,9 +13,7 @@ This guide provides step-by-step instructions for setting up a monitoring stack 
 
 ### Installation Steps
 
-Simply follow the instructions in the file called `tilt-pi-monitor-stack-docker-guide.md`
-
-The `docker-compose.yaml`, configuration file for Telegraf, and `.env` file are in this repository, although you can copy and paste from the guide.md
+Follow the instructions in **[tilt-pi-monitor-stack-docker-guide.md](./tilt-pi-monitor-stack-docker-guide.md)** to set up your monitoring stack. The required files, including `docker-compose.yaml`, the Telegraf configuration file, and `.env`, are provided for convenience. You can also copy and paste directly from the guide if preferred.
 
 ---
 
@@ -24,18 +22,18 @@ If you encounter issues or have suggestions for improvements, feel free to open 
 
 ---
 
-## Plans for the Future
-
-- Dockerize the Node-RED aspect of the Tilt Pi.
-- Dockerize the aioblescan to allow capturing data directly from the Tilt Hydrometer.
+## Future Plans
+- Dockerize the Node-RED aspect of the Tilt Pi for simplified deployment.
+- Dockerize `aioblescan` to allow direct data capture from the Tilt Hydrometer as a light weight alterntive to Node-Red
 
 ---
 
 ## Acknowledgments
 
-I would like to thank Baron Brew, the creators of the Tilt Hydrometer, for creating such a great product and for the support they’ve offered throughout this project. Their customer service and community-focused approach has been great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
+I would like to thank **Baron Brew Equipment**, the creators of the **Tilt Hydrometer**, for creating such a great product and for the support they’ve offered throughout this project. Their customer service and community-focused approach has been great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
 
 [Learn more about their products](https://tilthydrometer.com).
+
 
 ---
 
@@ -60,5 +58,5 @@ Under the following terms:
 
 ---
 
-By contributing to this project, you agree that your contributions will be licensed under the same Creative Commons license.
+By contributing to this project, you agree that your contributions will be licensed under the same license.
 

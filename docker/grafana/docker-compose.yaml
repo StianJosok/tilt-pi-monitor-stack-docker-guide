@@ -1,0 +1,16 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    user: '0'
+    ports:
+      - '3000:3000'
+    volumes:
+      - '/home/pi/docker/grafana/data:/var/lib/grafana'
+    networks:
+      - tilt-pi-network
+
+networks:
+  tilt-pi-network:
+    external: true
