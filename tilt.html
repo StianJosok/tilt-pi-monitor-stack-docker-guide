@@ -1,0 +1,374 @@
+<h1 id="extracting-data-from-a-tilt-hydrometer-and-displaying-it-using-grafana">Extracting Data from a Tilt Hydrometer and Displaying It Using Grafana</h1>
+<p>This guide will walk you step-by-step through setting up a monitoring stack with Docker to extract data from a Tilt Hydrometer and display it in Grafana. Together, we&#39;ll replicate the functionality of the Tilt Pi UI, including tracking gravity, temperature, and basic metrics. You&#39;ll also have room to expand into advanced Grafana features like ABV over time, apparent attenuation, and fermentation rate.</p>
+<hr>
+<h2 id="prerequisites-setting-up-tilt-pi">Prerequisites: Setting Up Tilt Pi</h2>
+<p>To get started, you need to have a Tilt Pi installed on a Raspberry Pi with an active connection to your Tilt Hydrometer. If you haven’t set this up yet, you can follow one of the official guides:</p>
+<ul>
+<li><a href="https://tilthydrometer.com/blogs/news/install-tilt-pi-on-raspbian-buster-compatible-with-all-rpi-models-including-rpi-4">Install Tilt Pi on Raspbian Buster</a> (for a clean or existing Raspberry Pi installation).</li>
+<li><a href="https://tilthydrometer.com/blogs/news/how-to-set-up-tilt-pi-part-1">Set Up Tilt Pi (Pre-installed Image)</a> (for using a pre-installed image).</li>
+</ul>
+<p>Once you&#39;ve completed the installation, you’ll have a working Tilt Pi ready to connect with your Tilt Hydrometer.</p>
+<hr>
+<h2 id="setting-up-docker-and-docker-compose">Setting Up Docker and Docker Compose</h2>
+<p>To build our monitoring stack, we’ll use Docker containers. If you&#39;re new to Docker, it&#39;s a tool for running applications in lightweight, isolated environments called containers. You can learn more about it from <a href="https://docs.docker.com/get-started/docker-overview/">Docker&#39;s official documentation</a>.</p>
+<hr>
+<h3 id="installing-docker-and-docker-compose">Installing Docker and Docker Compose</h3>
+<p>We&#39;ll use a script to install Docker and Docker Compose. Open your terminal and run:</p>
+<pre><code>curl -sSL https://get.docker.com | sh
+</code></pre>
+<p>This command will download and install Docker on your system. (I&#39;d recommend looking over any script before you run it on your machine, this one is a handy one)</p>
+<hr>
+<h3 id="running-docker-without-sudo">Running Docker Without <code>sudo</code></h3>
+<p>To avoid typing <code>sudo</code> every time you use Docker, add your user (who must have root privileges) to the Docker group:</p>
+<pre><code>sudo usermod -aG docker $USER
+</code></pre>
+<p>After running this command, <strong>log out</strong> and then <strong>log back in</strong> for the changes to take effect.</p>
+<hr>
+<h3 id="testing-your-docker-installation">Testing Your Docker Installation</h3>
+<p>You can verify that Docker is installed and running correctly by executing:</p>
+<pre><code>docker run hello-world
+</code></pre>
+<p>This will download and run a test container, printing a message to confirm that Docker is working.</p>
+<hr>
+<h2 id="networking-with-docker">Networking with Docker</h2>
+<p>To ensure all our containers can communicate with each other, we need to place them on the same Docker network.</p>
+<p>Run the following command to create a network called <code>tilt-pi-network</code>:</p>
+<pre><code>docker network create tilt-pi-network
+</code></pre>
+<hr>
+<h2 id="preparing-the-directory-structure-for-docker">Preparing the Directory Structure for Docker</h2>
+<p>To organize our Docker environment, we&#39;ll create a folder specifically for Docker and, within it, a <code>database</code> directory for InfluxDB and Telegraf. In this case my user&#39;s name is pi, but yours might be something different so change this accordingly:</p>
+<p><code>mkdir -p /home/pi/docker/database</code></p>
+<hr>
+<h2 id="setting-up-the-database-stack-influxdb-and-telegraf">Setting Up the Database Stack: InfluxDB and Telegraf</h2>
+<p>InfluxDB is a time-series database optimized for metrics and events, making it perfect for storing and analyzing fermentation data. Telegraf is a data collection agent that gathers metrics and forwards them to InfluxDB.</p>
+<p>We&#39;ll now create a <code>docker-compose.yml</code> file to define our database stack. This file will configure two services: InfluxDB and Telegraf.</p>
+<p>Navigate to the database folder you have just made</p>
+<p><code>cd /home/pi/docker/database</code></p>
+<hr>
+<h3 id="docker-compose-configuration">Docker Compose Configuration</h3>
+<p> Use <code>nano</code> or your preferred text editor to create the <code>docker-compose.yml</code> file:</p>
+<p><a href="https://www.nano-editor.org/dist/latest/cheatsheet.html">Nano Editor Cheatsheet</a></p>
+<p><code>nano docker-compose.yml</code></p>
+<ul>
+<li>Copy and paste the following content into the text editor:</li>
+</ul>
+<p>Here is the <code>docker-compose.yml</code> file for our database stack:</p>
+<pre><code class="language-yaml">services:
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb
+    restart: unless-stopped
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_ADMIN_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
+    ports:
+      - &quot;8086:8086&quot;
+    volumes:
+      - /home/pi/docker/database/data:/var/lib/influxdb2
+      - /home/pi/docker/database/config:/etc/influxdb2
+    networks:
+      - tilt-pi-network
+
+  telegraf_tilt-pi-scraper:
+    image: telegraf:latest
+    container_name: telegraf_tilt-pi-scraper
+    restart: unless-stopped
+    environment:
+      - INFLUX_TOKEN=${INFLUX_TOKEN}
+      - INFLUX_ORG=${INFLUXDB_ORG}
+      - INFLUX_BUCKET=${INFLUXDB_BUCKET}
+      - INFLUX_URL=http://influxdb:8086
+    volumes:
+      - /home/pi/docker/database/tilt-pi-scraper_telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - tilt-pi-network
+
+networks:
+  tilt-pi-network:
+    external: true
+</code></pre>
+<hr>
+<p>Now hit <code>Ctrl+S</code> to save, then <code>Ctrl+X</code> to exit.</p>
+<h3 id="creating-the-env-file">Creating the <code>.env</code> File</h3>
+<p>To securely store sensitive credentials and allow for easier configuration, create a <code>.env</code> file in the same directory as the <code>docker-compose.yml</code> file (the <code>database</code> folder). Add the following content:</p>
+<p><code>nano .env</code></p>
+<pre><code># InfluxDB Admin Credentials
+INFLUXDB_ADMIN_USERNAME=your_admin_username
+INFLUXDB_ADMIN_PASSWORD=your_admin_password
+INFLUXDB_ADMIN_TOKEN=your_admin_token
+
+# InfluxDB Organization and Bucket
+INFLUXDB_ORG=homebrew
+INFLUXDB_BUCKET=fermentation-data
+
+# Telegraf Token
+INFLUX_TOKEN=you-will-generate-this-later-in-influxDB-dashboard
+</code></pre>
+<p>Replace <code>your_admin_username</code>, <code>your_admin_password</code>, and <code>your_admin_token</code> with values of your choice. Keep the influxDB values as they are unless you know what you are doing. You will need to generate an API token later and update the <code>INFLUX_TOKEN</code> field.</p>
+<hr>
+<h2 id="starting-the-influxdb-service">Starting the InfluxDB Service</h2>
+<p>Now that we have defined our <code>docker-compose.yml</code> file, we’ll start the InfluxDB service.</p>
+<p>Run the following command from the directory containing your <code>docker-compose.yml</code> file:</p>
+<pre><code>docker compose up -d influxdb
+</code></pre>
+<p>This command starts <em>only</em> the <code>influxdb</code> service. It will download the required image if it’s not already on your system and initialize InfluxDB using the credentials and settings specified in the <code>.env</code> file.</p>
+<hr>
+<h3 id="verifying-influxdb-is-running">Verifying InfluxDB is Running</h3>
+<p>Now we will quickly check if our databse is running before setting up Telegraf</p>
+<p>Once the command completes, open your browser and navigate to:</p>
+<pre><code>http://&lt;your-raspberry-pi-ip&gt;:8086
+</code></pre>
+<p>You should see the InfluxDB web UI ogin page. Log in using the credentials you defined in the <code>.env</code> file.</p>
+<h3 id="influxdb-admin-credentials">InfluxDB Admin Credentials</h3>
+<pre><code>INFLUXDB_ADMIN_USERNAME=your_admin_username
+INFLUXDB_ADMIN_PASSWORD=your_admin_password
+</code></pre>
+<h4 id="troubleshooting">Troubleshooting</h4>
+<p>If you do not see a dashboard, check your ip is correct and use</p>
+<pre><code>docker logs influxdb
+</code></pre>
+<p>To check the logs of the container. You should be able to work out what is misconfigured from there.</p>
+<hr>
+<h2 id="configuring-influxdb-for-telegraf">Configuring InfluxDB for Telegraf</h2>
+<p>Now that we’ve logged into InfluxDB and see the dashboard, we’ll create the API token Telegraf needs to write data to the database.</p>
+<hr>
+<h3 id="1-navigate-to-api-tokens">1. Navigate to API Tokens</h3>
+<p>On the left-hand side menu, hover over the upward pointing arrow (Load data), go to <strong>API Tokens</strong>. This is where we’ll generate a custom token to allow Telegraf to write data to our database and for Grafana to read that data.</p>
+<h3 id="2-generate-a-custom-token">2. Generate a Custom Token</h3>
+<ol>
+<li>Click <strong>Generate API Token</strong>.</li>
+<li>Choose <strong>Custom API Token</strong>.</li>
+<li>Give the token a meaningful description, like <code>telegraf_fermentation</code>.</li>
+<li>select <strong>Buckets</strong></li>
+<li>Set <strong>Write Permissions</strong> abd <strong>Read Permissions</strong> for the <code>fermentation-data</code> bucket using the checkboxes</li>
+</ol>
+<p>Click <strong>Generate</strong> to generate the token.</p>
+<p>A window will pop up with your newly created API token. You will only be able to see this once, so copy it and paste it somewhere for use later.</p>
+<p><strong>Note:</strong> There is a known bug where the copy button does not work properly, so highlight the token and copy it.</p>
+<h3 id="3-update-the-env-file">3. Update the <code>.env</code> File</h3>
+<p>with your copied API token, update your <code>.env</code> file with the following line:</p>
+<pre><code>nano .env
+</code></pre>
+<p>and update the INfLUX_TOKEN value</p>
+<pre><code>INFLUX_TOKEN=your-newly-generated-token-here
+</code></pre>
+<p>save and exit</p>
+<hr>
+<h2 id="creating-the-telegraf-configuration-file">Creating the Telegraf Configuration File</h2>
+<p>Now that we’ve set up InfluxDB and generated our API token, the next step is to configure Telegraf to scrape data from the Tilt Pi and send it to InfluxDB.</p>
+<h3 id="1-create-the-telegraf-configuration-file">1. Create the Telegraf Configuration File</h3>
+<p>Navigate to the directory where your <code>docker-compose.yml</code> file is stored:</p>
+<p><code>cd /home/pi/docker/database</code></p>
+<p>Use <code>nano</code> or your preferred text editor to create the Telegraf configuration file:</p>
+<pre><code>nano tilt-pi-scraper_telegraf.conf
+</code></pre>
+<h3 id="2-input-the-configuration">2. Input the Configuration</h3>
+<p>Copy and paste the following into the <code>tilt-pi-scraper_telegraf.conf</code> file:</p>
+<ul>
+<li><strong>IMPORTANT</strong> Replace <code>&lt;your-raspberry-pi-ip&gt;</code> with the IP address of your Raspberry Pi at the top keeping the <code>:1880/macid/all</code> after your ip.</li>
+</ul>
+<pre><code>[[inputs.http]]
+  data_format = &quot;json_v2&quot;
+  name_override = &quot;sensor_data&quot;
+  urls = [&quot;http://&lt;your-raspberry-pi-ip&gt;:1880/macid/all&quot;]
+  interval = &quot;10s&quot;
+  response_timeout = &quot;5s&quot;
+  method = &quot;GET&quot;
+
+
+[[inputs.http.json_v2]]
+  measurement_name = &quot;sensor_data&quot;
+
+  [[inputs.http.json_v2.object]]
+    path = &quot;0&quot;  # Targets the first element in the array
+
+    # Tags
+    [[inputs.http.json_v2.object.tag]]
+      path = &quot;Color&quot;
+
+    # Fields
+    [[inputs.http.json_v2.object.field]]
+      path = &quot;tx_power&quot;
+      type = &quot;int&quot;
+
+    [[inputs.http.json_v2.object.field]]
+      path = &quot;rssi&quot;
+      type = &quot;int&quot;
+
+    [[inputs.http.json_v2.object.field]]
+      path = &quot;Temp&quot;
+      type = &quot;float&quot;
+
+    [[inputs.http.json_v2.object.field]]
+      path = &quot;ferm&quot;
+      type = &quot;float&quot;
+
+
+# Output Plugin: InfluxDB v2
+[[outputs.influxdb_v2]]
+  urls = [&quot;${INFLUX_URL}&quot;]
+  token = &quot;${INFLUX_TOKEN}&quot;
+  organization = &quot;${INFLUX_ORG}&quot;
+  bucket = &quot;${INFLUX_BUCKET}&quot;
+
+[[processors.rename]]
+
+  [[processors.rename.replace]]
+    tag = &quot;host&quot;
+    dest = &quot;container-id&quot;
+</code></pre>
+<p>Save and exit the file.</p>
+<ul>
+<li><strong>Optional Interval Configuration</strong>: The <code>interval</code> parameter defines how often Telegraf scrapes data from the Tilt Pi. In this example, it&#39;s set to <code>10s</code> the default. <ul>
+<li>If you&#39;re using an low spec SD card for storage or running on a lower-spec Raspberry Pi, increasing this interval (e.g., <code>30s</code> or <code>1m</code>) may help reduce writes and storage usage. If you change this value due to hardware constraints, you may want to consider changing the <code>response_timeout</code> value as well.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-start-the-telegraf-service">3. Start the Telegraf Service</h3>
+<p>With the configuration in place, we are ready to start sending data to influxDB:</p>
+<pre><code>docker compose up -d
+</code></pre>
+<hr>
+<h2 id="verifying-data-in-influxdb">Verifying Data in InfluxDB</h2>
+<p>Now that the Telegraf service is running, we’ll confirm that data from the Tilt Pi is being received by our InfluxDB database.</p>
+<h3 id="1-open-the-influxdb-dashboard">1. Open the InfluxDB Dashboard</h3>
+<p>In your browser, navigate to your InfluxDB instance:</p>
+<pre><code>http://&lt;your-raspberry-pi-ip&gt;:8086
+</code></pre>
+<h3 id="2-verify-data-in-the-bucket">2. Verify Data in the Bucket</h3>
+<p>Once logged in:</p>
+<ol>
+<li>Navigate to the <strong>Data Explorer</strong> section from the left-hand menu (upward arrow).</li>
+<li>Select <strong>Buckets</strong></li>
+<li>Select the <code>fermentation-data</code> bucket.</li>
+<li>Use the query builder to select data associated with the <code>sensor_data</code> measurement.</li>
+<li>After selecting <code>sensor_data</code> you should see <code>Color</code>. Select your Tilt Color</li>
+<li>Then you will see all of the sensor outputs: <strong>Temp</strong>, <strong>ferm</strong>, <strong>rssi</strong>, and <strong>tx_power</strong> select one or all of these and hit submit. You should see some vlaues plotted above (won&#39;t be much because it just started logging data)</li>
+</ol>
+<p>If you see the expected data, your setup is working correctly, and InfluxDB is receiving information from Telegraf.</p>
+<h3 id="troubleshooting-tips">Troubleshooting Tips</h3>
+<ul>
+<li><strong>No Data in the Bucket</strong>:<ul>
+<li>Check the logs for the Telegraf container:<br><code>docker logs telegraf_tilt-pi-scraper</code></li>
+<li>Verify the <code>tilt-pi-scraper_telegraf.conf</code> file for typos, especially the <code>urls</code> field.</li>
+<li>Ensure the IP address of your Tilt Pi is correct and reachable.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="setting-up-the-grafana-visualization-container">Setting Up the Grafana Visualization Container</h2>
+<p>Now we will set up our data visualization. We will create a <strong>Grafana</strong> container using Docker Compose.</p>
+<h3 id="1-prepare-the-directory-structure">1. Prepare the Directory Structure</h3>
+<p>Navigate to your Docker directory and create a folder for Grafana:</p>
+<pre><code>cd /home/pi/docker  
+mkdir grafana  
+cd grafana  
+</code></pre>
+<h3 id="2-create-the-docker-compose-file">2. Create the Docker Compose File</h3>
+<p>Create a new <code>docker-compose.yml</code> file for Grafana:</p>
+<pre><code>nano docker-compose.yml
+</code></pre>
+<p>Paste the following content into the file, ensuring the paths align with your pi username:</p>
+<pre><code>services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    user: &#39;0&#39;
+    ports:
+      - &#39;3000:3000&#39;
+    volumes:
+      - &#39;/home/pi/docker/grafana/data:/var/lib/grafana&#39;
+    networks:
+      - tilt-pi-network
+
+networks:
+  tilt-pi-network:
+    external: true
+</code></pre>
+<p>Save and exit the file.</p>
+<h3 id="3-start-the-grafana-container">3. Start the Grafana Container</h3>
+<p>Run the following command to start the Grafana container:</p>
+<pre><code>docker compose up -d
+</code></pre>
+<p>This will create and start the Grafana service.</p>
+<h3 id="4-access-the-grafana-dashboard">4. Access the Grafana Dashboard</h3>
+<p>Open your browser and navigate to:</p>
+<pre><code>http://&lt;your-raspberry-pi-ip&gt;:3000
+</code></pre>
+<p>You should see the Grafana login screen. Use the default credentials to log in:</p>
+<ul>
+<li><strong>Username</strong>: admin  </li>
+<li><strong>Password</strong>: admin</li>
+</ul>
+<p>Grafana will prompt you to change the default password after your first login. Choose a secure password and proceed. You should be greeted by the dashboard.</p>
+<hr>
+<h2 id="connecting-grafana-to-influxdb">Connecting Grafana to InfluxDB</h2>
+<p>Now that Grafana is running, we need to connect it to our InfluxDB database to start visualizing data.</p>
+<h3 id="1-access-data-sources">1. Access Data Sources</h3>
+<p>On the left-hand side of the Grafana dashboard, in the &quot;burger&quot; menu look for the <strong>Connections</strong> tab. Click on <strong>Data Sources</strong>.  </p>
+<p>Next, click <strong>Add Data Source</strong> and select <strong>InfluxDB</strong>. </p>
+<ul>
+<li>If InfluxDB does not appear as a suggestion, use the search bar to find it.</li>
+</ul>
+<h3 id="2-configure-the-data-source">2. Configure the Data Source</h3>
+<p>In the Data Source settings, configure the following fields:</p>
+<ul>
+<li><strong>Name</strong>: Rename the data source to <code>fermentation-data</code>.</li>
+<li><strong>Query Language</strong>: Change this to <code>Flux</code>.</li>
+<li><strong>URL</strong>: Enter this exact url --&gt; <code>http://influxdb:8086</code>.</li>
+<li><strong>Basic Auth</strong>: Uncheck this option.</li>
+<li><strong>Organization</strong>: Enter <code>homebrew</code> (or the organization name you used in your <code>.env</code> file).</li>
+<li><strong>Token</strong>: paste your token from influx from earlier</li>
+</ul>
+<p>Click <strong>Save &amp; Test</strong>. </p>
+<p>If everything is set up correctly, you should see a green box that says:</p>
+<p><strong>Datasource is working. 1 bucket found.</strong></p>
+<p>This confirms that Grafana is now connected to your InfluxDB database.</p>
+<hr>
+<h2 id="visualizing-your-tilt-hydrometer-data">Visualizing Your Tilt Hydrometer Data</h2>
+<p>Now for the fun part! We can finally visualize the data coming from our Tilt Hydrometer in Grafana.</p>
+<h3 id="1-create-a-dashboard-in-grafana">1. Create a Dashboard in Grafana</h3>
+<ol>
+<li>Click on <strong>Dashboard</strong> in the left-hand menu.</li>
+<li>Select <strong>Create Dashboard</strong> and then click <strong>Add Visualization</strong>.</li>
+<li>In the visualization settings, select your data source (<code>fermentation-data</code>).</li>
+</ol>
+<h3 id="2-editing-a-panel">2. Editing a Panel</h3>
+<p>We are now in a panel editor. By default, the visualization type at the top right is set to &quot;Time Series&quot;. We can change it to &quot;Stat&quot; for a cleaner display of individual metrics like temperature or specific gravity (SG).</p>
+<h3 id="3-use-the-influxdb-query-builder">3. Use the InfluxDB Query Builder</h3>
+<p>Open a new tab and go to the InfluxDB dashboard and into the <strong>Data Explorer</strong> tab</p>
+<p>InfluxDB Data Explorer provides a <strong>Query Builder</strong> tool that can help generate the correct Flux query for your specific setup. Use this to create your query with all the right values. Then select the script editor, and finally copy and paste it into Grafana.</p>
+<h4 id="example-query">Example query</h4>
+<pre><code>from(bucket: &quot;fermentation-data&quot;)  
+  |&gt; range(start: v.timeRangeStart, stop: v.timeRangeStop)  
+  |&gt; filter(fn: (r) =&gt; r[&quot;_measurement&quot;] == &quot;sensor_data&quot;)  
+  |&gt; filter(fn: (r) =&gt; r[&quot;Color&quot;] == &quot;BLUE&quot;)  
+  |&gt; filter(fn: (r) =&gt; r[&quot;_field&quot;] == &quot;Temp&quot;)   
+  |&gt; aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)  
+  |&gt; yield(name: &quot;mean&quot;)
+</code></pre>
+<h3 id="4-view-your-dashboard">4. View Your Dashboard</h3>
+<p>Once the query is pasted into the grafana, you can hit <strong>refresh</strong> to see if your query has worked, and then hit back to dashboard.</p>
+<p>Repeat this process to add visualizations for SG (specific gravity), RSSI (signal strength), or any other data points provided by the Tilt Hydrometer. With a few additions, you’ll have a simple dashboard that replicates much of the functionality of the Tilt Pi UI, with room for expansion into more complex data analysis and visualization. </p>
+<hr>
+<h3 id="example-dashboard">Example Dashboard</h3>
+<p>Here’s an example of my current dashboard while brewing a Stone Cold IPA. Note that when we added dry hops, it temporarily disturbed the SG reading, but it eventually settled out.</p>
+<hr>
+<h3 id="what-can-this-be-used-for">What can this be used for?</h3>
+<p>Using this pipeline and Grafana for visualization, you can:</p>
+<ul>
+<li>Monitor <strong>current data</strong></li>
+<li>Identify <strong>trends</strong> during fermentation.</li>
+<li>Export and compare data across fermentation periods.</li>
+</ul>
+<p>This information allows you to make better decisions and ultimately brew better beer. Enjoy your newfound brewing insights!</p>
+<p>This guide covers the basics of getting information into Grafana and visualizing it. The goal of this guide was to keep things as simple as possible.</p>
+<hr>
+<h3 id="note-on-using-many-tilt-hydrometers">Note on Using Many Tilt Hydrometers</h3>
+<p>The provided configuration in <code>tilt-pi-scraper_telegraf.conf</code> uses the <strong>Color</strong> attribute as a tag to differentiate data. If you have multiple Tilt Hydrometers and would like to uniquely identify them, you can modify the configuration to use the <strong>uuid</strong> as the identifier instead of the Color tag or alongside the tag. This ensures that each hydrometer&#39;s data is distinctly tracked, even if they share the same Color attribute.</p>
