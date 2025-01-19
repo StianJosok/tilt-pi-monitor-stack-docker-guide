@@ -84,13 +84,13 @@ Navigate to the database folder you have just made
 
 ### Docker Compose Configuration
 
- To create the `docker-compose.yml` file, use `nano` to create and edit the `docker-compose.yml` file:
+ Use `nano` or your preferred text editor to create the `docker-compose.yml` file:
+
+[Nano Editor Cheatsheet](https://www.nano-editor.org/dist/latest/cheatsheet.html)
 
 `nano docker-compose.yml`
 
-- Copy and paste the following content into the file:
-    - you might need to change the path under the volume sections. For docker volume bindings, the host path is on the left side of the `:` So if your username is `jim`you would need to change the left side to `/home/jim/docker/database/data:/var/lib/influxdb` for the first volume binding.
-
+- Copy and paste the following content into the text editor:
 
 Here is the `docker-compose.yml` file for our database stack:
 
@@ -136,6 +136,10 @@ networks:
 
 ---
 
+
+Now hit `Ctrl+S` to save, then `Ctrl+X` to exit.
+
+
 ### Creating the `.env` File
 
 To securely store sensitive credentials and allow for easier configuration, create a `.env` file in the same directory as the `docker-compose.yml` file (the `database` folder). Add the following content:
@@ -175,6 +179,8 @@ This command starts *only* the `influxdb` service. It will download the required
 
 ### Verifying InfluxDB is Running
 
+Now we will quickly check if our databse is running before setting up Telegraf
+
 Once the command completes, open your browser and navigate to:
 
     http://<your-raspberry-pi-ip>:8086
@@ -183,8 +189,10 @@ You should see the InfluxDB web UI ogin page. Log in using the credentials you d
 
     
 ### InfluxDB Admin Credentials
-    INFLUXDB_ADMIN_USERNAME=whatever-value-you-put-here
-    INFLUXDB_ADMIN_PASSWORD=and-here
+    INFLUXDB_ADMIN_USERNAME=your_admin_username
+    INFLUXDB_ADMIN_PASSWORD=your_admin_password
+
+#### Troubleshooting
 
 If you do not see a dashboard, check your ip is correct and use
     
@@ -203,19 +211,22 @@ Now that we’ve logged into InfluxDB and see the dashboard, we’ll create the 
 
 ### 1. Navigate to API Tokens
 
-On the left-hand side menu, hover over the upward pointing arrow, go to **API Tokens**. This is where we’ll generate a custom token to allow Telegraf to write data to our database.
+On the left-hand side menu, hover over the upward pointing arrow (Load data), go to **API Tokens**. This is where we’ll generate a custom token to allow Telegraf to write data to our database and for Grafana to read that data.
 
 ### 2. Generate a Custom Token
 
 1. Click **Generate API Token**.
 2. Choose **Custom API Token**.
-3. Give the token a meaningful description, like `telegraf_fermentation_write`.
+3. Give the token a meaningful description, like `telegraf_fermentation`.
 4. select **Buckets**
-5. Set **Write Permissions** for the `fermentation-data` bucket using the checkbox under the write side (which is also the right site).
+5. Set **Write Permissions** abd **Read Permissions** for the `fermentation-data` bucket using the checkboxes
 
 Click **Generate** to generate the token.
 
-A window will pop up with your newly created API token. You will only be able to see this once, so copy it.
+
+A window will pop up with your newly created API token. You will only be able to see this once, so copy it and paste it somewhere for use later.
+
+**Note:** There is a known bug where the copy button does not work properly, so highlight the token and copy it.
 
 ### 3. Update the `.env` File
 
@@ -223,7 +234,7 @@ with your copied API token, update your `.env` file with the following line:
 
     nano .env
 
-and update the INLUX_TOKEN value
+and update the INfLUX_TOKEN value
 
     INFLUX_TOKEN=your-newly-generated-token-here
 
@@ -239,7 +250,7 @@ Now that we’ve set up InfluxDB and generated our API token, the next step is t
 
 Navigate to the directory where your `docker-compose.yml` file is stored:
 
-cd /home/pi/docker/database
+`cd /home/pi/docker/database`
 
 Use `nano` or your preferred text editor to create the Telegraf configuration file:
 
@@ -431,29 +442,11 @@ In the Data Source settings, configure the following fields:
 
 - **Name**: Rename the data source to `fermentation-data`.
 - **Query Language**: Change this to `Flux`.
-- **URL**: Enter this excact url --> `http://influxdb:8086`.
+- **URL**: Enter this exact url --> `http://influxdb:8086`.
 - **Basic Auth**: Uncheck this option.
 - **Organization**: Enter `homebrew` (or the organization name you used in your `.env` file).
-- **Token**: paste your token (a different one than the write token from earlier) **using the intructions below**
+- **Token**: paste your token from influx from earlier
 
-### Generate a Read API Token in InfluxDB
-
-To allow Grafana to read from InfluxDB, we need to create a read-only API token:
-
-1. Go to your InfluxDB dashboard `http://<your-raspberry-pi-ip>:8086`
-2. Hover over the **upward arrow** on the left-hand menu and select **API Tokens**.
-3. Click **Generate API Token** and select **Custom API Token**.
-4. Give the token a description like `grafana_read_token` (or a similar meaningful name).
-5. For the `fermentation-data` bucket, using  the checkbox check **Read** permissions.
-6. Click **Generate**
-
-Copy the token that InfluxDB generates
-
-### Add the Token in Grafana
-
-Go back to Grafana and paste the API token into the **Token** field under the Data Source settings.
-
-### 3. Save and Test
 
 Click **Save & Test**. 
 
@@ -477,11 +470,16 @@ Now for the fun part! We can finally visualize the data coming from our Tilt Hyd
 
 ### 2. Editing a Panel
 
-We are now in a panel editor. By default, the visualization type at the top right is set to "Time Series". Here, We can change it to "Stat" for a cleaner display of individual metrics like temperature or specific gravity (SG).
+We are now in a panel editor. By default, the visualization type at the top right is set to "Time Series". We can change it to "Stat" for a cleaner display of individual metrics like temperature or specific gravity (SG).
 
-### 3. Create a Query for Temperature
 
-In the query editor, enter a query to retrieve temperature data from your database. An example query might look like this:
+### 3. Use the InfluxDB Query Builder
+
+Open a new tab and go to the InfluxDB dashboard and into the **Data Explorer** tab
+
+InfluxDB Data Explorer provides a **Query Builder** tool that can help generate the correct Flux query for your specific setup. Use this to create your query with all the right values. Then select the script editor, and finally copy and paste it into Grafana.
+
+#### Example query
 
 ```
 from(bucket: "fermentation-data")  
@@ -492,20 +490,11 @@ from(bucket: "fermentation-data")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)  
   |> yield(name: "mean")
 ```
-### 4. Use the InfluxDB Query Builder
-
-You will need to adjust the query based on your specific setup:
-
-InfluxDB Data Explorer provides a **Query Builder** tool that can help generate the correct Flux query for your specific setup. Use this to create your query with all the right values and paste it into Grafana.
-
-- **Color**: Match the color of your Tilt Hydrometer.
 
 
-### 5. View Your Dashboard
+### 4. View Your Dashboard
 
-Once the query is configured:
-
-You can hit refresh to see if your query has worked.
+Once the query is pasted into the grafana, you can hit **refresh** to see if your query has worked, and then hit back to dashboard.
 
 Repeat this process to add visualizations for SG (specific gravity), RSSI (signal strength), or any other data points provided by the Tilt Hydrometer. With a few additions, you’ll have a simple dashboard that replicates much of the functionality of the Tilt Pi UI, with room for expansion into more complex data analysis and visualization. 
 
