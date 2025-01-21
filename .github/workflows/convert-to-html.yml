@@ -3,52 +3,36 @@ name: Convert Markdown to HTML
 on:
   push:
     paths:
-      - "tilt-pi-monitor-stack-docker-guide.md" # Trigger only when this file changes
-  workflow_dispatch: # Allow manual triggering of the workflow
+      - 'tilt-pi-monitor-stack-docker-guide.md'
 
 jobs:
-  convert-markdown:
+  render-markdown:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11" # Specify exact version for stability
-
-      - name: Install dependencies
-        run: pip install markdown
-
-      - name: Convert Markdown to HTML
+      - name: Convert Markdown to HTML via API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -c "
-          import markdown
-          input_file = 'tilt-pi-monitor-stack-docker-guide.md'
-          output_file = 'tilt-pi-monitor-stack-docker-guide.html'
-          with open(input_file, 'r') as md_file:
-              content = md_file.read()
-          html_content = markdown.markdown(content)
-          with open(output_file, 'w') as html_file:
-              html_file.write(html_content)
-          "
+          CONTENT=$(cat tilt-pi-monitor-stack-docker-guide.md)
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"$CONTENT\", \"mode\": \"gfm\"}" \
+            https://api.github.com/markdown)
+          echo "$RESPONSE" > tilt-pi-monitor-stack-docker-guide.html
 
-      - name: Check for Changes
+      - name: Create New Branch
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b update-html-$(date +%Y%m%d%H%M%S)
+
+      - name: Commit and Push HTML
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
           git add tilt-pi-monitor-stack-docker-guide.html
-          git diff --cached --quiet || echo "Changes detected."
-        id: changes
-
-      - name: Create Pull Request
-        if: success() && steps.changes.outputs.changes == 'Changes detected.'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          commit-message: "feat: add HTML version of markdown guide"
-          branch: "feat/convert-md-to-html"
-          title: "feat: Add converted HTML file"
-          body: |
-            This pull request adds the HTML version of `tilt-pi-monitor-stack-docker-guide.md`.
+          git commit -m "feat: convert guide to html"
+          git push origin HEAD
