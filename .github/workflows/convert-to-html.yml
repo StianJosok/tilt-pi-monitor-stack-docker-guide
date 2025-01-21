@@ -36,15 +36,15 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Commit Changes
+      - name: Create and Switch to New Branch
         run: |
-          git checkout -b update-html  # Create a new branch for the changes
+          git checkout -b update-html-${{ github.run_id }}  # Use a unique branch name based on the workflow run ID
           git add tilt-pi-monitor-stack-docker-guide.html
           git commit -m "feat: add or update HTML version of the guide"
 
       - name: Push Changes to New Branch
         run: |
-          git push -u origin update-html
+          git push -u origin update-html-${{ github.run_id }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -52,6 +52,8 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: update-html
+          branch: update-html-${{ github.run_id }}
           title: "feat: add or update HTML version of the guide"
-          body: "This pull request contains the latest HTML conversion of the guide for review."
+          body: |
+            This pull request contains the latest HTML conversion of the guide for review.
+            - Workflow Run ID: ${{ github.run_id }}
