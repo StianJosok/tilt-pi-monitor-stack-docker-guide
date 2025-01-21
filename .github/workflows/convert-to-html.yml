@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - tilt-pi-monitor-stack-docker-guide.md  # Trigger only when this file changes
-  workflow_dispatch:  # Allow manual triggering of the workflow
+      - tilt-pi-monitor-stack-docker-guide.md
+  workflow_dispatch:
 
 jobs:
   convert:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout repository
@@ -28,13 +28,15 @@ jobs:
         run: |
           markdown-to-html --input=tilt-pi-monitor-stack-docker-guide.md --output=tilt-pi-monitor-stack-docker-guide.html
 
-      - name: Configure Git
+      - name: Debug Git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git status
+          git remote -v
+          git branch
 
       - name: Commit and push changes
         run: |
+          git pull --rebase
           git add tilt-pi-monitor-stack-docker-guide.html
           git commit -m "feat: add or update HTML version of the guide"
           git push
