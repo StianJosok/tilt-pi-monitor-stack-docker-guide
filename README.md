@@ -20,14 +20,14 @@ If you encounter issues or have suggestions for improvements, feel free to open 
 
 ## License
 
-### Creative Commons Attribution 4.0 International (CC BY 4.0)
+### Creative Commons Attribution 4.0 International (CC BY-SA 4.0)
 
 Copyright (c) 2024 Stian Jøsok
 
 You are free to:
 
 - **Share**: Copy and redistribute the material in any medium or format.
-- **Adapt**: Remix, transform, and build upon the material for any purpose, even commercially.
+- **Adapt**: Remix, transform, and build upon the material for any purpose.
 
 Under the following terms:
 
@@ -35,7 +35,8 @@ Under the following terms:
 
 - **No additional restrictions**: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-[Read the full license here](https://creativecommons.org/licenses/by/4.0/).
+[License Documentation](LICENSE.md)
+[Read the full license here](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ---
 
