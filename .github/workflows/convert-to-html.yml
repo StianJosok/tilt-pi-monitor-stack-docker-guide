@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'tilt-pi-monitor-stack-docker-guide.md'
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   render-markdown:
