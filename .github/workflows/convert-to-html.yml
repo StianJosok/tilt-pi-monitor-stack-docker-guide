@@ -35,9 +35,14 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Create and Push New Branch
+      - name: Create New Branch
         run: |
           git checkout -b update-html-${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit Changes
+        run: |
           git add tilt-pi-monitor-stack-docker-guide.html
           git commit -m "feat: add or update HTML version of the guide"
           git push -u origin update-html-${{ github.run_id }}
