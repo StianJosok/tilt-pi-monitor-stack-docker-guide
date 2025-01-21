@@ -541,4 +541,3 @@ This guide covers the basics of getting information into Grafana and visualizing
 ### Note on Using Many Tilt Hydrometers
 
 The provided configuration in `tilt-pi-scraper_telegraf.conf` uses the **Color** attribute as a tag to differentiate data. If you have multiple Tilt Hydrometers and would like to uniquely identify them, you can modify the configuration to use the **uuid** as the identifier instead of the Color tag or alongside the tag. This ensures that each hydrometer's data is distinctly tracked, even if they share the same Color attribute.
-
