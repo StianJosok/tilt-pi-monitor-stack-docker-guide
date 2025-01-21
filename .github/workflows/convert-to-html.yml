@@ -17,37 +17,38 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: "3.11" # Specify exact version for stability
 
-      - name: Install markdown-to-html tool
+      - name: Install dependencies
         run: pip install markdown
 
       - name: Convert Markdown to HTML
         run: |
           python -c "
           import markdown
-          with open('tilt-pi-monitor-stack-docker-guide.md', 'r') as md_file:
+          input_file = 'tilt-pi-monitor-stack-docker-guide.md'
+          output_file = 'tilt-pi-monitor-stack-docker-guide.html'
+          with open(input_file, 'r') as md_file:
               content = md_file.read()
           html_content = markdown.markdown(content)
-          with open('tilt-pi-monitor-stack-docker-guide.html', 'w') as html_file:
+          with open(output_file, 'w') as html_file:
               html_file.write(html_content)
           "
 
-      - name: Commit and Push HTML File
+      - name: Check for Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add tilt-pi-monitor-stack-docker-guide.html
-          git commit -m "Convert markdown to HTML"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git diff --cached --quiet || echo "Changes detected."
+        id: changes
 
       - name: Create Pull Request
+        if: success() && steps.changes.outputs.changes == 'Changes detected.'
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: "Add HTML version of markdown guide"
-          branch: "convert-md-to-html"
-          title: "Add converted HTML file"
+          commit-message: "feat: add HTML version of markdown guide"
+          branch: "feat/convert-md-to-html"
+          title: "feat: Add converted HTML file"
           body: |
             This pull request adds the HTML version of `tilt-pi-monitor-stack-docker-guide.md`.
