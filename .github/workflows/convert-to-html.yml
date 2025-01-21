@@ -9,11 +9,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Allow writing to repository contents
+  contents: write
 
 jobs:
   convert:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -28,8 +28,7 @@ jobs:
         run: npm install -g markdown-to-html-cli
 
       - name: Convert Markdown to HTML
-        run: |
-          markdown-to-html --input=tilt-pi-monitor-stack-docker-guide.md --output=tilt-pi-monitor-stack-docker-guide.html
+        run: markdown-to-html --input=tilt-pi-monitor-stack-docker-guide.md --output=tilt-pi-monitor-stack-docker-guide.html
 
       - name: Configure Git Identity
         run: |
@@ -38,22 +37,20 @@ jobs:
 
       - name: Create and Switch to New Branch
         run: |
-          git checkout -b update-html-${{ github.run_id }}  # Use a unique branch name based on the workflow run ID
+          git checkout -b update-html-${{ github.run_id }}
           git add tilt-pi-monitor-stack-docker-guide.html
           git commit -m "feat: add or update HTML version of the guide"
-
-      - name: Push Changes to New Branch
-        run: |
           git push -u origin update-html-${{ github.run_id }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-html-${{ github.run_id }}
-          title: "feat: add or update HTML version of the guide"
+          base: main
+          title: "feat: Convert Markdown to HTML"
           body: |
-            This pull request contains the latest HTML conversion of the guide for review.
-            - Workflow Run ID: ${{ github.run_id }}
+            This pull request updates the HTML version of the guide.
+            - Triggered by changes to `tilt-pi-monitor-stack-docker-guide.md`.
