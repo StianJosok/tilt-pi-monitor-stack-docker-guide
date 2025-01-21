@@ -518,7 +518,7 @@ Here’s an example of my current dashboard. Note that when we added dry hops to
 
 ![Lucky Jack APA](blog-post-images/img_8.png)
 
-### StoneCold IPA Dashboard
+### Stone Cold IPA Dashboard
 
 ![Stone Cold IPA](blog-post-images/img_7.png)
 
