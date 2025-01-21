@@ -35,7 +35,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Create and Switch to New Branch
+      - name: Create and Push New Branch
         run: |
           git checkout -b update-html-${{ github.run_id }}
           git add tilt-pi-monitor-stack-docker-guide.html
