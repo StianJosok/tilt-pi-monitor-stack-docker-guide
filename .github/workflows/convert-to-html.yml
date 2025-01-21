@@ -1,0 +1,42 @@
+name: Convert Markdown to HTML
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - tilt-pi-monitor-stack-docker-guide.md  # Trigger only when this file changes
+  workflow_dispatch:  # Allow manual triggering of the workflow
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install markdown-to-html-cli
+        run: npm install -g markdown-to-html-cli
+
+      - name: Convert Markdown to HTML
+        run: |
+          markdown-to-html --input=tilt-pi-monitor-stack-docker-guide.md --output=tilt-pi-monitor-stack-docker-guide.html
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        run: |
+          git add tilt-pi-monitor-stack-docker-guide.html
+          git commit -m "feat: add or update HTML version of the guide"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
