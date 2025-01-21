@@ -1,4 +1,4 @@
-name: Convert Markdown to HTML
+name: Convert Markdown to HTML and Create PR
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
     paths:
       - tilt-pi-monitor-stack-docker-guide.md
   workflow_dispatch:
+
+permissions:
+  contents: write  # Allow writing to repository contents
 
 jobs:
   convert:
@@ -28,17 +31,27 @@ jobs:
         run: |
           markdown-to-html --input=tilt-pi-monitor-stack-docker-guide.md --output=tilt-pi-monitor-stack-docker-guide.html
 
-      - name: Debug Git
+      - name: Configure Git Identity
         run: |
-          git status
-          git remote -v
-          git branch
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
-      - name: Commit and push changes
+      - name: Commit Changes
         run: |
-          git pull --rebase
+          git checkout -b update-html  # Create a new branch for the changes
           git add tilt-pi-monitor-stack-docker-guide.html
           git commit -m "feat: add or update HTML version of the guide"
-          git push
+
+      - name: Push Changes to New Branch
+        run: |
+          git push -u origin update-html
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-html
+          title: "feat: add or update HTML version of the guide"
+          body: "This pull request contains the latest HTML conversion of the guide for review."
