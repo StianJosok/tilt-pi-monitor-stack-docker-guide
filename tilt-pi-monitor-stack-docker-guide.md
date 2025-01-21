@@ -213,6 +213,8 @@ Now that we’ve logged into InfluxDB and see the dashboard, we’ll create the 
 
 On the left-hand side menu, hover over the upward pointing arrow (Load data), go to **API Tokens**. This is where we’ll generate a custom token to allow Telegraf to write data to our database and for Grafana to read that data.
 
+![API sidebar](blog-post-images/img_1.png)
+
 ### 2. Generate a Custom Token
 
 1. Click **Generate API Token**.
@@ -222,6 +224,8 @@ On the left-hand side menu, hover over the upward pointing arrow (Load data), go
 5. Set **Write Permissions** abd **Read Permissions** for the `fermentation-data` bucket using the checkboxes
 
 Click **Generate** to generate the token.
+
+![Generate API Token](blog-post-images/img_2.png)
 
 
 A window will pop up with your newly created API token. You will only be able to see this once, so copy it and paste it somewhere for use later.
@@ -351,6 +355,8 @@ Once logged in:
 
 If you see the expected data, your setup is working correctly, and InfluxDB is receiving information from Telegraf.
 
+![Data in the Bucket](blog-post-images/img_3.png)
+
 ### Troubleshooting Tips
 
 - **No Data in the Bucket**:
@@ -375,7 +381,7 @@ Navigate to your Docker directory and create a folder for Grafana:
 
 ### 2. Create the Docker Compose File
 
-Create a new `docker-compose.yml` file for Grafana:
+Create a **new** `docker-compose.yml` file for Grafana:
 
     nano docker-compose.yml
 
@@ -412,7 +418,7 @@ This will create and start the Grafana service.
 
 ### 4. Access the Grafana Dashboard
 
-Open your browser and navigate to:
+Open your browser and open a new tab to:
 
     http://<your-raspberry-pi-ip>:3000
 
@@ -432,6 +438,8 @@ Now that Grafana is running, we need to connect it to our InfluxDB database to s
 ### 1. Access Data Sources
 
 On the left-hand side of the Grafana dashboard, in the "burger" menu look for the **Connections** tab. Click on **Data Sources**.  
+
+![Data Sources](blog-post-images/img_4.png)
 
 Next, click **Add Data Source** and select **InfluxDB**. 
 - If InfluxDB does not appear as a suggestion, use the search bar to find it.
@@ -455,6 +463,8 @@ If everything is set up correctly, you should see a green box that says:
 **Datasource is working. 1 bucket found.**
 
 This confirms that Grafana is now connected to your InfluxDB database.
+
+![Setting up InfluxDB for Grafana](blog-post-images/img_5.png)
 
 ---
 
@@ -490,7 +500,7 @@ from(bucket: "fermentation-data")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)  
   |> yield(name: "mean")
 ```
-
+![Panel Editor in Grafana](blog-post-images/img_6.png)
 
 ### 4. View Your Dashboard
 
@@ -502,7 +512,15 @@ Repeat this process to add visualizations for SG (specific gravity), RSSI (signa
 
 ### Example Dashboard
 
-Here’s an example of my current dashboard while brewing a Stone Cold IPA. Note that when we added dry hops, it temporarily disturbed the SG reading, but it eventually settled out.
+Here’s an example of my current dashboard. Note that when we added dry hops to the Stone Cold IPA, it temporarily disturbed the SG reading, but it eventually settled out.
+
+### Lucky Jack APA
+
+![Lucky Jack APA](blog-post-images/img_8.png)
+
+### StoneCold IPA Dashboard
+
+![Stone Cold IPA](blog-post-images/img_7.png)
 
 ---
 
