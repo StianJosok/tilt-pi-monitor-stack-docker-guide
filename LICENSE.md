@@ -1,6 +1,6 @@
 ## License
 
-This guide is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC 4.0)**.
+This guide is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)**.
 
 ---
 
@@ -14,7 +14,6 @@ This guide is licensed under the **Creative Commons Attribution-NonCommercial-Sh
 ## Under the following terms:
 
 - **Attribution (BY)**: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner.
-- **NonCommercial (NC)**: You may not use the material for commercial purposes without prior written permission from the author.
 - **ShareAlike (SA)**: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
 ---
@@ -22,8 +21,6 @@ This guide is licensed under the **Creative Commons Attribution-NonCommercial-Sh
 ## Additional Terms:
 
 - **No Warranty**: The material is provided "as is," without warranty of any kind, either express or implied.
-
-- **Commercial Use Permission**: For commercial licensing or specific permissions, contact the author.
 
 ---
 
@@ -39,4 +36,4 @@ The **guide itself**, including but not limited to written instructions and expl
 
 
 **Read the Full License**:  
-[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)
