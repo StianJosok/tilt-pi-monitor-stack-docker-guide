@@ -1,61 +1,53 @@
-name: Convert Markdown to HTML and Create PR
+name: Convert Markdown to HTML
 
 on:
   push:
-    branches:
-      - main
     paths:
-      - tilt-pi-monitor-stack-docker-guide.md
-  workflow_dispatch:
-
-permissions:
-  contents: write
+      - "tilt-pi-monitor-stack-docker-guide.md" # Trigger only when this file changes
+  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
-  convert:
+  convert-markdown:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          node-version: '16'
+          python-version: "3.x"
 
-      - name: Install markdown-to-html-cli
-        run: npm install -g markdown-to-html-cli
+      - name: Install markdown-to-html tool
+        run: pip install markdown
 
       - name: Convert Markdown to HTML
-        run: markdown-to-html --input=tilt-pi-monitor-stack-docker-guide.md --output=tilt-pi-monitor-stack-docker-guide.html
-
-      - name: Configure Git Identity
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
+          python -c "
+          import markdown
+          with open('tilt-pi-monitor-stack-docker-guide.md', 'r') as md_file:
+              content = md_file.read()
+          html_content = markdown.markdown(content)
+          with open('tilt-pi-monitor-stack-docker-guide.html', 'w') as html_file:
+              html_file.write(html_content)
+          "
 
-      - name: Create New Branch
+      - name: Commit and Push HTML File
         run: |
-          git checkout -b update-html-${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit Changes
-        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add tilt-pi-monitor-stack-docker-guide.html
-          git commit -m "feat: add or update HTML version of the guide"
-          git push -u origin update-html-${{ github.run_id }}
+          git commit -m "Convert markdown to HTML"
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: update-html-${{ github.run_id }}
-          base: main
-          title: "feat: Convert Markdown to HTML"
+          commit-message: "Add HTML version of markdown guide"
+          branch: "convert-md-to-html"
+          title: "Add converted HTML file"
           body: |
-            This pull request updates the HTML version of the guide.
-            - Triggered by changes to `tilt-pi-monitor-stack-docker-guide.md`.
+            This pull request adds the HTML version of `tilt-pi-monitor-stack-docker-guide.md`.
