@@ -3,6 +3,9 @@
 ## Overview
 This guide explains how to set up a monitoring stack using Docker, InfluxDB, Telegraf, and Grafana to track data from a Tilt Hydrometer. It provides step-by-step instructions for creating a complete data monitoring and visualization pipeline.
 
+[Step-by-Step Guide for Setting Up Tilt Pi Monitoring](tilt-pi-monitor-stack-docker-guide.md)
+
+
 ![Example Dashboard](/blog-post-images/img_8.png)
 
 ---
@@ -10,8 +13,10 @@ This guide explains how to set up a monitoring stack using Docker, InfluxDB, Tel
 ## Getting Started
 
 ### Prerequisites
-- A functioning Tilt Hydrometer.
 - A Raspberry Pi
+- A functioning Tilt Hydrometer with a functioning UI
+    - [Using RPi Imager](https://www.youtube.com/watch?v=9xwI5jm2fsY)
+    - [How to Set Up Your Tilt Pi app (for Raspberry Pi)](https://www.youtube.com/watch?v=lapJqK-IeiA)
 
 ---
 
