@@ -3,6 +3,8 @@
 ## Overview
 This guide explains how to set up a monitoring stack using Docker, InfluxDB, Telegraf, and Grafana to track data from a Tilt Hydrometer. It provides step-by-step instructions for creating a complete data monitoring and visualization pipeline.
 
+![Example Dashboard](/blog-post-images/img_8.png)
+
 ---
 
 ## Getting Started
