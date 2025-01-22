@@ -10,9 +10,7 @@ This guide explains how to set up a monitoring stack using Docker, InfluxDB, Tel
 
 ---
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 - A Raspberry Pi
 - A functioning Tilt Hydrometer with a functioning UI
     - [Using RPi Imager](https://www.youtube.com/watch?v=9xwI5jm2fsY)
@@ -20,11 +18,25 @@ This guide explains how to set up a monitoring stack using Docker, InfluxDB, Tel
 
 ---
 
+## Acknowledgments
+
+I would like to thank [the creators](https://tilthydrometer.com/pages/about-us) of the **Tilt Hydrometer** for creating such a great product and for the support they’ve offered throughout this project. Their customer service and community-focused approach has been great. They have helped me with some details and been quick to respond. Their engagement has fueled me to make my own setup better and given me the opportunity to give back to the community of homebrewers and homelabbers.
+
+[Learn more about their products](https://tilthydrometer.com).
+
+---
+
+## Plans for the Future
+
+- Dockerize the Node-RED aspect of the Tilt Pi.
+- Dockerize the aioblescan to allow capturing data directly from the Tilt Hydrometer.
+
+---
+
 ## Issues and Support
 If you encounter issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
 
 ---
-
 ## License
 
 This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International License](LICENSE.md).
