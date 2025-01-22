@@ -11,8 +11,10 @@ This guide explains how to set up a monitoring stack using Docker, InfluxDB, Tel
 ---
 
 ## Prerequisites
-- A Raspberry Pi
+- A Raspberry Pi (I have tested with 3b+ but not lower spec)
 - A functioning Tilt Hydrometer with a functioning UI
+    - [Install Tilt Pi on Raspbian Buster](https://tilthydrometer.com/blogs/news/install-tilt-pi-on-raspbian-buster-compatible-with-all-rpi-models-including-rpi-4) (for a clean or existing Raspberry Pi installation).
+    - [Set Up Tilt Pi (Pre-installed Image)](https://tilthydrometer.com/blogs/news/how-to-set-up-tilt-pi-part-1) (for using a pre-installed image).
     - [Using RPi Imager](https://www.youtube.com/watch?v=9xwI5jm2fsY)
     - [How to Set Up Your Tilt Pi app (for Raspberry Pi)](https://www.youtube.com/watch?v=lapJqK-IeiA)
 
