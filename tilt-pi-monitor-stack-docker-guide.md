@@ -8,7 +8,7 @@ This guide will walk you step-by-step through setting up a monitoring stack with
 
 To get started, you need to have a Tilt Pi installed on a Raspberry Pi with an active connection to your Tilt Hydrometer. If you haven’t set this up yet, you can follow one of the official guides:
 
-- [Install Tilt Pi on Raspbian Buster](https://tilthydrometer.com/blogs/news/install-tilt-pi-on-raspbian-buster-compatible-with-all-rpi-models-including-rpi-4) (for a clean or existing Raspberry Pi installation).
+- [Install Tilt Pi on Raspbian Bookworm](https://tilthydrometer.com/blogs/news/install-tilt-pi-on-raspbian-buster-compatible-with-all-rpi-models-including-rpi-4) (for a clean or existing Raspberry Pi installation).
 - [Set Up Tilt Pi (Pre-installed Image)](https://tilthydrometer.com/blogs/news/how-to-set-up-tilt-pi-part-1) (for using a pre-installed image).
 
 Once you've completed the installation, you’ll have a working Tilt Pi ready to connect with your Tilt Hydrometer.
