@@ -271,8 +271,8 @@ Copy and paste the following into the `tilt-pi-scraper_telegraf.conf` file:
   data_format = "json_v2"
   name_override = "sensor_data"
   urls = ["http://<your-raspberry-pi-ip>:1880/macid/all"]
-  interval = "10s"
-  response_timeout = "5s"
+  interval = "1m"
+  response_timeout = "30s"
   method = "GET"
 
 
@@ -320,8 +320,8 @@ Copy and paste the following into the `tilt-pi-scraper_telegraf.conf` file:
 
 Save and exit the file.
 
-- **Optional Interval Configuration**: The `interval` parameter defines how often Telegraf scrapes data from the Tilt Pi. In this example, it's set to `10s` the default. 
-  - If you're using an low spec SD card for storage or running on a lower-spec Raspberry Pi, increasing this interval (e.g., `30s` or `1m`) may help reduce writes and storage usage. If you change this value due to hardware constraints, you may want to consider changing the `response_timeout` value as well.
+- **Optional Interval Configuration**: The `interval` parameter defines how often Telegraf scrapes data from the Tilt Pi. In this example, it's set to `1m` the default. 
+  - If you're using an low spec SD card for storage or running on a lower-spec Raspberry Pi, increasing this interval (e.g., `5m` or `10m`) may help reduce writes and storage usage. If you change this value due to hardware constraints, you may want to consider changing the `response_timeout` value as well.
 
 ### 3. Start the Telegraf Service
 
