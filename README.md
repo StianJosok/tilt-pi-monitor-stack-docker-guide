@@ -30,8 +30,9 @@ I would like to thank [the creators](https://tilthydrometer.com/pages/about-us) 
 
 ## Plans for the Future
 
-- Dockerize the Node-RED aspect of the Tilt Pi.
-- Dockerize the aioblescan to allow capturing data directly from the Tilt Hydrometer.
+
+- [ ] Dockerize the Node-RED aspect of the Tilt Pi. See [jgwehr/brewpi – tiltpi dockerfiles](https://github.com/jgwehr/brewpi/tree/master/services/tiltpi/dockerfiles) for related work.
+- [x] Dockerize [aioblescan-Influxdb](https://github.com/StianJosok/aioblescan-Influxdb) to allow capturing data directly from the Tilt Hydrometer.
 
 ---
 
